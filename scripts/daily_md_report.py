@@ -79,9 +79,50 @@ def save_report(content, date_str):
     
     return filepath
 
+def ensure_git_identity():
+    """确保 Git 用户信息已配置，优先使用环境变量，否则设置为默认机器人身份"""
+    import subprocess
+
+    name = (
+        os.environ.get("GIT_AUTHOR_NAME")
+        or os.environ.get("GIT_COMMITTER_NAME")
+    )
+    email = (
+        os.environ.get("GIT_AUTHOR_EMAIL")
+        or os.environ.get("GIT_COMMITTER_EMAIL")
+    )
+
+    def get_config(key):
+        result = subprocess.run(
+            ["git", "config", "--get", key],
+            cwd=BASE_DIR,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+        )
+        return result.stdout.strip()
+
+    name = name or get_config("user.name")
+    email = email or get_config("user.email")
+
+    if name and email:
+        return
+
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        name = name or "github-actions[bot]"
+        email = email or "41898282+github-actions[bot]@users.noreply.github.com"
+    else:
+        name = name or "ai-news-radar-bot"
+        email = email or "ai-news-radar-bot@example.com"
+
+    subprocess.run(["git", "config", "user.name", name], cwd=BASE_DIR, check=True)
+    subprocess.run(["git", "config", "user.email", email], cwd=BASE_DIR, check=True)
+
 def git_commit_push(date_str):
     """Git commit 并 push"""
     import subprocess
+
+    ensure_git_identity()
     
     # 检查是否有变化
     result = subprocess.run(
