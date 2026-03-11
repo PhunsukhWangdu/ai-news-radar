@@ -84,6 +84,7 @@ python -m http.server 8080
 - 任务：执行抓取命令并提交 `data/*`
 - RSS OPML：若设置了 `FOLLOW_OPML_B64`，工作流会自动解码为 `feeds/follow.opml`
 - 推送权限：使用 `GITHUB_TOKEN`（workflow 内）
+- 注意（fork 仓库不跑定时）：GitHub 会禁用 fork 仓库的 `schedule` 触发器，因此本仓库的 `.github/workflows/update-news.yml` 与 `.github/workflows/daily-md-report.yml` 不会按 cron 自动执行。要启用定时，请在非 fork 仓库使用这些 workflow（例如新建仓库并推送代码），或在另一个非 fork 仓库创建定时 workflow，使用 PAT 调用本仓库的 `workflow_dispatch`。仍可在 Actions 页面手动运行。
 
 ---
 
@@ -102,6 +103,7 @@ You only need to run one command, or let GitHub Actions run it on schedule.
   - `python scripts/update_news.py --output-dir data --window-hours 24 --rss-opml feeds/follow.opml`
 - Scheduled automation:
   - `.github/workflows/update-news.yml` runs every 30 minutes and commits updated data.
+- Important (schedules are disabled on forks): GitHub blocks the `schedule` trigger in forked repos, so `.github/workflows/update-news.yml` and `.github/workflows/daily-md-report.yml` will not fire on cron here. To get timed runs, use these workflows in a non-fork repo (for example, push the code to a new repo) or have another non-fork repo run a cron workflow that calls this repo’s `workflow_dispatch` with a PAT. You can still run them manually from the Actions tab.
 
 ### 2. Core features
 

@@ -3,6 +3,7 @@ name: Daily AI News MD Report
 on:
   workflow_dispatch:
   schedule:
+    # GitHub blocks scheduled runs on forked repos; run in a non-fork repo or trigger manually.
     - cron: "0 12 * * *"
 
 permissions:
