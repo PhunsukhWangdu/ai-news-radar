@@ -3,6 +3,7 @@ name: Update AI News Snapshot
 on:
   workflow_dispatch:
   schedule:
+    # GitHub blocks scheduled runs on forked repos; run in a non-fork repo or trigger manually.
     - cron: "*/30 * * * *"
 
 permissions:
